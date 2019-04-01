@@ -1,0 +1,36 @@
+
+
+KV 344009 (ML & Pattern Classification): TRAINING DATA
+======================================================
+
+Dear colleagues,
+
+we have now compiled the training data for you.
+There are 2 x 14 text files (.arff format; can be directly
+loaded into WEKA): 14 hours of radio, one file each for
+music and speech detection, respectively.
+
+The format should be self-explanatory: header part with
+names and types of features ("attributes"); data part with
+training examples. Each line is a training example, the last
+"attribute" is the class label.
+
+You can download a 220 MB .zip file containing all of these:
+
+http://drive.jku.at/ssf/s/readFile/share/8938/7190245535447807040/publicLink/train.zip
+
+
+Please let me know if you encounter any problems.
+Sanity check: each file should contain around 5 x 3,600 = 18,000 examples.
+("around" because the audios were not cut precisely to a length of
+60:00 minutes.)
+
+And remember: we don't expect you to necessarily use all the data in your
+experiments ... use (well chosen) subsets if the computation load becomes
+too heavy!
+
+Have fun!
+
+- gerhard widmer
+
+

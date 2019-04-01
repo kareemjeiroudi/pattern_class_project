@@ -15,12 +15,12 @@ def main():
         data, meta = arff.loadarff(f)
         ## Convert to a datafram for plotting
         dataset = pd.DataFrame(data)
-        ## Convert last column in the dataset to strings
-        X = dataset.iloc[:, :-1].values
-        y = np.array([1 if str(w, 'utf-8') == 'music' else 0 for w in dataset.iloc[:, -1]])
-        print(dataset.head())
-        features = ["f000705", "f000704"]
-        print(trainClassifiers(X[0:100],y[0:100]))
+	## Convert last column in the dataset to strings
+	X = dataset.iloc[:, :-1].values
+	y = np.array([1 if str(w, 'utf-8') == 'music' else 0 for w in dataset.iloc[:, -1]])
+	print(dataset.head())
+	features = ["f000705", "f000704"]
+	print(trainClassifiers(X[0:100],y[0:100]))
 
 if __name__ == '__main__':
     main()
