@@ -20,6 +20,10 @@ In this document, I store all remarks I make during running different code. This
 
   ![Class Imbalance](Class_Imbalance_speech.png)
 
-* The same goes for music files
+* The same goes for music files. Here these two plots make absolute sense, because as you can observe in the first hour where there was a lot of Speech there wasn't music, and the same goes for the rest of these 14 hours except the 2nd hour, what could this hour have? These two plots follow the same order.
 
   ![Music File Class Imbalance](Class_Imbalance_music.png)
+
+* This one is also interesting, because you can see that when there's Speech most features are very flat. Here, one another remark can made about the music data: the music values are always more extremer [-0.3 :0.7] than those of Speech [0.0: 0.175].
+
+  ![AllFeatures_14Hours](AllFeatures_14Hours.png)

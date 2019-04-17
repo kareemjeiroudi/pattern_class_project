@@ -7,16 +7,14 @@ Created on Mon Apr  17 15:55:13 2019
 @title: Count Plot
 @description: plot the subplots all on the same figure 
 """
-
-#### function to sort the files ####
-import re
 #### Find the files from the directory ####
+import re
 import os
-## Collect names for all files and sort the file names right away
+# Collect names for all files and sort the file names right away
 path = r"data/train_arff/"
 music_files = sorted([path+file for file in os.listdir(path) if 'music' in file], \
                       key=lambda file_name: int(re.findall(r"\d+", file_name)[0]))
-## Collect name of speech files and sort the file names right away
+# Collect name of speech files and sort the file names right away
 speech_files = sorted([path+file for file in os.listdir(path) if 'speech' in file], \
                       key=lambda file_name: int(re.findall(r"\d+", file_name)[0]))
 
