@@ -26,4 +26,23 @@ In this document, I store all remarks I make during running different code. This
 
 * This one is also interesting, because you can see that when there's Speech most features are very flat. Here, one another remark can made about the music data: the music values are always more extremer [-0.3 :0.7] than those of Speech [0.0: 0.175].
 
-  ![AllFeatures_14Hours](AllFeatures_14Hours.png)
+  ![Figure {}: Mean values of each features. The x-axis corresponds ot the 14 hours of broadcast.](AllFeatures_14Hours.png)
+
+* Some datapoints are most likely mislabeled. For instance, the datapoint (4767, 1) in the last music file doesn't belong to any neighboring segments. The datapoint was labeled 0 (no_music), however, all neighbouring datapoints are of type music.
+
+  ```python
+  y[4767]
+  Out[65]: 1.0
+  
+  y[4768]
+  Out[66]: 1.0
+  
+  y[4766]
+  Out[67]: 0.0
+  
+  y[4769]
+  Out[68]: 1.0
+  
+  y[4765]
+  Out[69]: 1.0
+  ```

@@ -8,25 +8,22 @@ Modified on Wed April 17 11:25:57 2019
 @title: discover trends
 """
 
-#### Find the files from the directory ####
+######## Find the files from the directory ########
 import re
 import os
 ## Collect names for all files and sort the file names right away
 path = r"data/train_arff/"
 music_files = sorted([path+file for file in os.listdir(path) if 'music' in file], \
                       key=lambda file_name: int(re.findall(r"\d+", file_name)[0]))
-## Collect name of speech files and sort the file names right away
 speech_files = sorted([path+file for file in os.listdir(path) if 'speech' in file], \
                       key=lambda file_name: int(re.findall(r"\d+", file_name)[0]))
 
-## Collect the means of every feature from every file
+######## Saving in matrices and vectors ########
+## run the followin two loop if you want to save the data in matrices and vectors (already done)
 import numpy as np
 import pandas as pd
 from scipy.io import arff
-no_speech_means = []
-speech_means = []
-music_means = []
-no_music_means = []
+i = 0   ## to name files
 for file in music_files:
     with open(file, 'r') as f:
         ## Read arff
@@ -35,15 +32,23 @@ for file in music_files:
         dataset = pd.DataFrame(data)
     X = dataset.iloc[:, :-1].values
     print(X.shape)
-    y = np.array([1 if str(w, 'utf-8') == 'music' else 0 for w in dataset.iloc[:, -1]], dtype=np.int16)
-    dataset['class'] = y
-    ## calculate the mean of each feature where class is 0 and when class is 1 independently
-    no_music_means.append(np.mean(dataset[dataset['class']==0].values, axis=0))
-    music_means.append(np.mean(dataset[dataset['class']==1].values, axis=0))
-no_music_means = np.matrix(no_music_means)
-music_means = np.matrix(music_means)
-no_speech_means = np.matrix(no_speech_means)
-speech_means = np.matrix(speech_means)
+    y = np.array([1 if str(w, 'utf-8') == 'music' else 0 for w in dataset.iloc[:, -1].values], dtype=np.int16)
+        ## save data for easy reproduction
+    i+=1
+    np.savetxt("data/{}.X_music".format(i), X , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("data/{}.y_music".format(i), y , delimiter=' ', comments='# ', encoding=None)
+i = 0
+for file in speech_files:
+    with open(file, 'r') as f:
+        data, meta = arff.loadarff(f)
+        dataset = pd.DataFrame(data)
+    X = dataset.iloc[:, :-1].values
+    print(X.shape)
+    y = np.array([1 if str(w, 'utf-8') == 'speech' else 0 for w in dataset.iloc[:, -1].values], dtype=np.int16)
+    i+=1
+    np.savetxt("data/{}.X_speech".format(i), X , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("data/{}.y_speech".format(i), y , delimiter=' ', comments='# ', encoding=None)
+
 
 ## Plot the features along the 14 hours
 import matplotlib.pyplot as plt
@@ -60,3 +65,75 @@ ax[1,0].set_title('Music')
 ax[1,1].set_title('No_Music')
 fig.legend()
 fig.show()
+
+
+######## one file plot all features time series ########
+
+## load immediately for plotting
+X = np.loadtxt("data/train_Xy_numpy/13.X_music", delimiter=' ', comments='# ', encoding=None)
+y = np.loadtxt("data/train_Xy_numpy/13.y_music", delimiter=' ', comments='# ', encoding=None)
+
+def split_segments(limit=1500):
+    i = 0
+    new_segments = []
+    ranges = []
+    while(True):
+        list_to_append = []
+        ranges_to_append = []
+        while(y[i] == 1):
+            list_to_append.append(X.T[0, i])
+            ranges_to_append.append(i+1)
+            i+=1
+            if i >= limit:
+                new_segments.append(list_to_append)
+                ranges.append(ranges_to_append)
+                break
+        if y[i]==0 and y[i-1] == 1:
+             new_segments.append(list_to_append)
+             ranges.append(ranges_to_append)
+             list_to_append = []
+             ranges_to_append = []
+        while(y[i] == 0):
+            list_to_append.append(X.T[0, i])
+            ranges_to_append.append(i+1)
+            i+=1
+            if i >= limit:
+                new_segments.append(list_to_append)
+                ranges.append(ranges_to_append)
+                break
+        if y[i]==1 and y[i-1] == 0:
+             new_segments.append(list_to_append)
+             ranges.append(ranges_to_append)
+             list_to_append = []
+             ranges_to_append = []
+        if i >= limit:
+            break
+    return new_segments, ranges
+
+def plot_time_series(segments, ranges):
+    %matplotlib auto
+    c = 0
+    for i in range(len(segments)):
+        if c % 2 == 0:
+            color = 'blue'
+        else:
+            color = 'orange'
+        plt.plot(ranges[i], segments[i], c=color)
+        c+=1
+    
+    plt.show()
+
+segments, ranges = split_segments(5000)
+plot_time_series(segments, ranges)
+
+
+%matplotlib auto
+plt.plot([i for i in range(len(X))], X.T[0])
+plt.plot([i for i in range(len(X))], y)
+plt.plot([i for i in range(500)], X.T[0][:500])
+plt.show()
+                     
+                     
+                     
+                     
+                     
