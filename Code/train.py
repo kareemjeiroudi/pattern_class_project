@@ -1,10 +1,10 @@
 ## Fitting classifier to the Training set
 from sklearn import linear_model
-from sklearn.model_selection import RandomizedSearchCV, cross_val_score
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.dummy import DummyClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, make_scorer
+#from sklearn.metrics import accuracy_score, make_scorer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
@@ -12,9 +12,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 from optimize import getSearchSpace, interpret_params
-
-import warnings
-
 
 from bayes_opt import BayesianOptimization
 
@@ -77,6 +74,8 @@ def trainClassifiers(X, y):
     folds = 5
     all_metrics = {}
 
+    model_types = ['SVM', 'RandomForest']
+    
     for model in model_types:
         # get parameter search space and optimization function in accord with model type
         searchSpace, objectiveFunction = getSearchSpace(model, X, y)

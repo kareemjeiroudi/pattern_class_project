@@ -6,22 +6,30 @@
 """
 from sklearn.svm import SVC
 from sklearn import linear_model
-from sklearn.model_selection import RandomizedSearchCV, cross_val_score
+from sklearn.model_selection import cross_val_score
 from sklearn.dummy import DummyClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, make_scorer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+
+import warnings
+
+# FIXME: ImportError: cannot import name 'getModelTypes'
+#from train import getModelTypes
+
+def getModelTypes():
+    return ['Baseline','Naive', 'QDAnalysis', 'KNN', 'SVM', 'DecisionTree', 'RandomForest', 'NN']
 
 def getSearchSpace(model, X, y):
     """ Returns the proper set of hyperparameters as well as objective function given a model type. Handy for Bayesian Optimization"""
 
     folds = 5
     RSEED = 0
+    trainableParameters = None
     
     if model == 'Naive':
         # TODO: Find out if BO works with no specified parameters
