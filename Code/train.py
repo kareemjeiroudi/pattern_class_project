@@ -65,6 +65,8 @@ def searchParamsForClassifiers(X, y):
 
 
 def trainClassifiers(X, y):
+    """Given training data, returns a list of accuracies calculated for different 
+    classifiers"""
     RSEED = 0
     model_types = getModelTypes()
     folds = 5
@@ -92,7 +94,8 @@ def trainClassifiers(X, y):
             classifier = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2),random_state=RSEED)
 
         #Perform Cross Validation for the current model
-        all_metrics[model] = cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score), error_score = "raise")
+        all_metrics[model] = cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score), 
+                   n_jobs=-1, verbose=0, error_score = "raise-deprecating")
         print("Model {} mean accuracy: {}".format(model, all_metrics[model].mean()))
 
     return all_metrics

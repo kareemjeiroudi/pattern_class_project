@@ -17,6 +17,7 @@ def getAccuarcyForClassifiers(X,y):
     plt.show()
 
 def getData(dataPath):
+    """Loads matrix of features X and vector of labels y given one .arff file"""
     with open(dataPath, 'r') as f:
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.arff.loadarff.html
         ## Read arff
@@ -38,7 +39,7 @@ def hyerParamSearchAll():
     return 0
 
 def main():
-    dataPath = r'C:\Users\Stefan\Documents\Dokumente\Studium\6.Semester\Machine Learning and Pattern Classification\Project\train\1.music.arff'
+    dataPath = '../data/train_arff/1.music.arff'
     print("Start Program")
     X, y = getData(dataPath)
     getAccuarcyForClassifiers(X,y)
