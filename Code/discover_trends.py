@@ -12,7 +12,7 @@ Modified on Wed April 17 11:25:57 2019
 import re
 import os
 ## Collect names for all files and sort the file names right away
-path = r"data/train_arff/"
+path = r"../data/train_arff/"
 music_files = sorted([path+file for file in os.listdir(path) if 'music' in file], \
                       key=lambda file_name: int(re.findall(r"\d+", file_name)[0]))
 speech_files = sorted([path+file for file in os.listdir(path) if 'speech' in file], \
@@ -35,8 +35,8 @@ for file in music_files:
     y = np.array([1 if str(w, 'utf-8') == 'music' else 0 for w in dataset.iloc[:, -1].values], dtype=np.int16)
         ## save data for easy reproduction
     i+=1
-    np.savetxt("data/{}.X_music".format(i), X , delimiter=' ', comments='# ', encoding=None)
-    np.savetxt("data/{}.y_music".format(i), y , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("../data/train_Xy_numpy/{}.X_music".format(i), X , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("../data/train_Xy_numpy/{}.y_music".format(i), y , delimiter=' ', comments='# ', encoding=None)
 i = 0
 for file in speech_files:
     with open(file, 'r') as f:
@@ -46,8 +46,8 @@ for file in speech_files:
     print(X.shape)
     y = np.array([1 if str(w, 'utf-8') == 'speech' else 0 for w in dataset.iloc[:, -1].values], dtype=np.int16)
     i+=1
-    np.savetxt("data/{}.X_speech".format(i), X , delimiter=' ', comments='# ', encoding=None)
-    np.savetxt("data/{}.y_speech".format(i), y , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("../data/train_Xy_numpy/{}.X_speech".format(i), X , delimiter=' ', comments='# ', encoding=None)
+    np.savetxt("../data/train_Xy_numpy/{}.y_speech".format(i), y , delimiter=' ', comments='# ', encoding=None)
 
 
 ## Plot the features along the 14 hours

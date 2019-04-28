@@ -5,14 +5,14 @@ from scipy.io import arff
 
 from train import trainClassifiers
 
-def getAccuarcyForClassifiers(X,y):
+def plotAccuarcyForClassifiers(X,y):
     results = trainClassifiers(X[:500], y[:500])
-
+    accuracies = [value['accuracy'] for value in results.values()]
     plt.figure(figsize=(15, 10))
     plt.title("Mean NSE for all sequence lengths")
     plt.ylabel("Classification Accuracy")
     plt.xlabel("Models")
-    plt.boxplot(results.values(), showmeans=True, notch=False)
+    plt.boxplot(accuracies, showmeans=True, notch=False)
     plt.xticks(range(1, len(results.keys()) + 1), results.keys(), rotation='horizontal')
     plt.show()
 
@@ -22,13 +22,13 @@ def getData(dataPath):
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.arff.loadarff.html
         ## Read arff
         data, meta = arff.loadarff(f)
-        ## Convert to a datafram for plotting
+        ## Convert to a dataframe
         dataset = pd.DataFrame(data)
 
         # Replace with real features we want to use but always include the class column
-        features = ["f000705", "f000704", "class"]
-        # dataset = dataset[features]
-        print(dataset.head())
+#        features = ["f000705", "f000704", "class"]
+#        dataset = dataset[features]
+#        print(dataset.head())
 
     # Split into data and labels
     X = dataset.iloc[:, :-1].values
@@ -42,7 +42,7 @@ def main():
     dataPath = '../data/train_arff/1.music.arff'
     print("Start Program")
     X, y = getData(dataPath)
-    getAccuarcyForClassifiers(X,y)
+    plotAccuarcyForClassifiers(X, y)
 
 if __name__ == '__main__':
     main()
