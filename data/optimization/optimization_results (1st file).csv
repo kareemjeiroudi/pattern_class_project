@@ -1,0 +1,8 @@
+Model,Accuracy,Best Params
+NN,0.9596759675967597,"{'hidden_layer_sizes': 16, 'alpha': 9.263406719097344e-05, 'learning_rate_init': 0.0008804217040183917, 'activation': 'tanh', 'solver': 'adam', 'n_layers': 2}"
+SVM,0.9618561856185618,"{'C': 1.0, 'degree': 3, 'gamma': 1.0, 'kernel': 'linear'}"
+Naive,0.9677167716771677,{'none_parameter': 0.05488135039273248}
+KNN,0.9218937893789378,"{'metric': 'euclidean', 'n_neighbors': 13, 'algorithm': 'ball_tree'}"
+DecisionTree,0.9600162016201621,"{'min_samples_leaf': 9, 'max_features': 40, 'criterion': 'gini', 'max_depth': 22}"
+Baseline,0.9040324032403241,{'none_parameter': 0.05488135039273248}
+RandomForest,0.9657167716771677,"{'max_features': 37, 'max_depth': 7, 'n_estimators': 62}"

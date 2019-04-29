@@ -32,11 +32,12 @@ def getSearchSpace(model, X, y):
     trainableParameters = None
     
     if model == 'Naive':
-        # TODO: Find out if BO works with no specified parameters
         # no hyperparameters to tune
-        classifier = GaussianNB()
-        def objective_function():
-            classifier = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, max_features=max_features)
+        trainableParameters = {
+                'none_parameter': (0, 0.1)
+                }
+        def objective_function(none_parameter):
+            classifier = GaussianNB()
             return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
                    verbose=0
 #                   error_score = "raise-deprecating"
@@ -44,7 +45,10 @@ def getSearchSpace(model, X, y):
             
     elif model == 'Baseline':
         # no hyperparameters to tune
-        def objective_function():
+        trainableParameters = {
+                'none_parameter': (0, 0.1)
+                }
+        def objective_function(none_parameter):
             classifier = DummyClassifier(strategy = "most_frequent", random_state=RSEED)
             return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
                    verbose=0
@@ -53,7 +57,10 @@ def getSearchSpace(model, X, y):
             
     elif model == 'LinearModel':
         # no hyperparameters to tune
-        def objective_function():
+        trainableParameters = {
+                'none_parameter': (0, 0.1)
+                }
+        def objective_function(none_parameter):
             classifier = linear_model.LinearRegression(normalize=True)
             return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
                    verbose=0
@@ -106,7 +113,7 @@ def getSearchSpace(model, X, y):
             'min_samples_leaf': (5, 10)
             }
         def objective_function(criterion, max_depth, max_features, min_samples_leaf):
-            criterion = int(round(kernel))
+            criterion = int(round(criterion))
             criterion = criteria[criterion]
             max_depth = int(round(max_depth))
             max_features = int(round(max_features))
@@ -146,26 +153,28 @@ def getSearchSpace(model, X, y):
     elif model == 'NN': # acr.: neural networks
         # reference lists
         activations = ['logistic', 'tanh', 'relu']
-        solvers = ['lbfgs', 'sgd', 'Adam']
+        solvers = ['lbfgs', 'sgd', 'adam']
         
         trainableParameters = {
                 'hidden_layer_sizes': (10, 100), # num. of neurons in hidden layers
+                'n_layers': (2, 10), 
                 'activation': (0, len(activations)-1),
-                'solvers': (0, len(solvers)-1),
+                'solver': (0, len(solvers)-1),
                 'alpha': (0.000001, 0.0001), # L2 penalty parameter
-                'learning_rate': (0.00001, 0.01)
+                'learning_rate_init': (0.00001, 0.01)
             }
-        def objective_function(hidden_layer_sizes, activation, solver, alpha, learning_rate):
+        def objective_function(hidden_layer_sizes, n_layers, activation, solver, alpha, learning_rate_init):
             hidden_layer_sizes = int(round(hidden_layer_sizes)) 
-            # convert to tupele
-            hidden_layer_sizes = (hidden_layer_sizes,) * len(n_layers)
+            n_layers = int(round(n_layers)) 
+            # convert to tuples
+            hidden_layer_sizes = (hidden_layer_sizes,) * n_layers
             activation = int(round(activation))
             activation = activations[activation]
             solver = int(round(solver))
             solver = solvers[solver]
             
             classifier = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation=activation,
-                                       solver=solver, alpha=alpha, learning_rate=learning_rate,
+                                       solver=solver, alpha=alpha, learning_rate_init=learning_rate_init,
                                        random_state=RSEED)
             return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
                        verbose=0
@@ -196,5 +205,47 @@ def interpret_params(params, model):
                 params[key] = value
             elif key == 'degree':
                 params[key] = int(round(params[key] ))
+                
+    elif model == 'KNN':
+        algorithms = ['ball_tree', 'kd_tree', 'brute']
+        metrics = ['euclidean', 'manhattan', 'minkowski']
+        for key in params.keys():
+            if key == 'algorithm':
+                value = algorithms[int(round(params.pop('algorithm')))]
+                params[key] = value
+            elif key == 'metric':
+                value = metrics[int(round(params.pop('metric')))]
+                params[key] = value
+            else:
+                params[key] = int(round(params[key]))
+    
+    elif model == 'DecisionTree':
+        criteria = ['gini', 'entropy']
+        for key in params.keys():
+            if key != 'criterion':
+                params[key] = int(round(params[key]))
+            else:
+                value = criteria[int(round(params.pop('criterion')))]
+                params[key] = value
+    
+    # TODO: add interpretation for QDAnalysis
+    elif model == 'QDAnalysis':
+        classifier = QuadraticDiscriminantAnalysis()
+        
+    elif model == 'NN': # acr.: neural networks
+        activations = ['logistic', 'tanh', 'relu']
+        solvers = ['lbfgs', 'sgd', 'adam']
+        for key in params.keys():
+            if key == 'hidden_layer_sizes':
+                params[key] = int(round(params[key]))
+            elif key == 'activation':
+                value = activations[int(round(params.pop('activation')))]
+                params[key] = value
+            elif key == 'solver':
+                value = solvers[int(round(params.pop('solver')))]
+                params[key] = value
+            elif key == 'n_layers':
+                params[key] = int(round(params[key]))
+            
     
     return params
