@@ -73,15 +73,15 @@ fig.show()
 X = np.loadtxt("data/train_Xy_numpy/13.X_music", delimiter=' ', comments='# ', encoding=None)
 y = np.loadtxt("data/train_Xy_numpy/13.y_music", delimiter=' ', comments='# ', encoding=None)
 
-def split_segments(limit=1500):
-    i = 0
+def split_segments(X,y,start=0, limit=1500, feature=0):
+    i = start
     new_segments = []
     ranges = []
     while(True):
         list_to_append = []
         ranges_to_append = []
         while(y[i] == 1):
-            list_to_append.append(X.T[0, i])
+            list_to_append.append(X.T[feature, i])
             ranges_to_append.append(i+1)
             i+=1
             if i >= limit:
@@ -94,7 +94,7 @@ def split_segments(limit=1500):
              list_to_append = []
              ranges_to_append = []
         while(y[i] == 0):
-            list_to_append.append(X.T[0, i])
+            list_to_append.append(X.T[feature, i])
             ranges_to_append.append(i+1)
             i+=1
             if i >= limit:
@@ -110,22 +110,53 @@ def split_segments(limit=1500):
             break
     return new_segments, ranges
 
-def plot_time_series(segments, ranges):
+def plot_time_series(y,segments, ranges,name='random.png'):
     %matplotlib auto
     c = 0
-    for i in range(len(segments)):
-        if c % 2 == 0:
+    for i in range(1,len(segments)):
+        if y[ranges[i][0]] == 0:
             color = 'blue'
         else:
             color = 'orange'
         plt.plot(ranges[i], segments[i], c=color)
         c+=1
     
-    plt.show()
+    plt.plot([],[],c='blue',label='music')
+    plt.plot([],[],c='orange',label='no music')
+    plt.legend()
+    plt.savefig(name)
 
-segments, ranges = split_segments(5000)
-plot_time_series(segments, ranges)
 
+def read_file(types,number):
+    with open(r'train/train/{}.{}.arff'.format(number,types), 'r') as f:
+            #https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.arff.loadarff.html
+            ## Read arff
+            data, meta = arff.loadarff(f)
+            ## Convert to a datafram for plotting
+            dataset = pd.DataFrame(data)
+            
+            ## Convert last column in the dataset to strings
+            X = dataset.iloc[:, :-1].values
+
+            y = np.array([1 if str(w, 'utf-8')==types else 0 for w in dataset.iloc[:,-1]])
+    return X,y
+
+X,y = read_file(types='music',number='6')
+segments, ranges = split_segments(X,y,start=0,limit=5000,feature=522)
+plot_time_series(y,segments, ranges)
+
+def all_files(t,features):
+    for yeet in range(1,15):
+        X,y = read_file(types=t,number=str(yeet))
+        for f in features:
+            segments,ranges = split_segments(X,y,start=0,limit=5000,feature=f)
+            filename=r'Graphen\{}{}_f{}_{}-{}.png'.format(types,yeet,f,0,5000)
+            plot_time_series(y,segments,ranges,filename)
+
+features=[0,47,75]
+types='speech'
+
+all_files(types,features)
 
 %matplotlib auto
 plt.plot([i for i in range(len(X))], X.T[0])
