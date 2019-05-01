@@ -22,7 +22,7 @@ import warnings
 #from train import getModelTypes
 
 def getModelTypes():
-    return ['Baseline','Naive', 'QDAnalysis', 'KNN', 'SVM', 'DecisionTree', 'RandomForest', 'NN']
+    return ['Baseline', 'LinearModel', 'Naive', 'KNN', 'SVM', 'DecisionTree', 'RandomForest', 'NN']
 
 def getSearchSpace(model, X, y):
     """ Returns the proper set of hyperparameters as well as objective function given a model type. Handy for Bayesian Optimization"""
@@ -61,7 +61,7 @@ def getSearchSpace(model, X, y):
                 'none_parameter': (0, 0.1)
                 }
         def objective_function(none_parameter):
-            classifier = linear_model.LinearRegression(normalize=True)
+            classifier = linear_model.LogisticRegression(normalize=True)
             return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
                    verbose=0
 #                   error_score = "raise-deprecating"
