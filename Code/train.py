@@ -6,7 +6,7 @@ from bayes_opt import BayesianOptimization
 
 from sklearn.svm import SVC
 from sklearn import linear_model
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
@@ -63,15 +63,19 @@ def trainClassifiers(X, y):
     model_types = getModelTypes()
     folds = 5
     all_metrics = {}
+    optimization_history = dict()
+
+    X_train, X_test, y_train, y_test = train_test_split(X,y,shuffle=True, train_size=0.8)
+    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train,shuffle=True)
 
     # TODO: learn about parameters of this removed classifier
-    model_types.remove('QDAnalysis') 
+    #model_types.remove('QDAnalysis')
 #    model_types = [#'SVM', 'RandomForest'
 #                    'KNN', 'DecisionTree']
     
     for model in model_types:
         # get parameter search space and optimization function in accord with model type
-        searchSpace, objectiveFunction = getSearchSpace(model, X, y)
+        searchSpace, objectiveFunction = getSearchSpace(model, X_train, y_train)
         
         # TODO: better handle this warning
         # skip this iteration if return values are None
@@ -88,6 +92,7 @@ def trainClassifiers(X, y):
 #        mean_accuracy = cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
 #                   verbose=0, error_score = "raise-deprecating")
         best_params = interpret_params(optimizer.max['params'], model)
+        optimization_history[model] = optimizer.res
         all_metrics[model] = {'accuracy': optimizer.max['target'], 'params': best_params, 'Average Training Time': avg_training_time}
         print("Model {} optimized mean accuracy: {}\nBest parameters:\n{}\nTook {}".format(model, optimizer.max['target'], best_params, avg_training_time))
 

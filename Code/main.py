@@ -13,11 +13,12 @@ def plotAccuarcyForClassifiers(X,y):
     # save cross validation results to .csv
     cv_results = performSystematicExperiments(X[:500], y[:500])
     saveResultsTo_csv(cv_results, optimized=False)
-    # 
-    results = trainClassifiers(X[:500], y[:500]);
+
+    """
+    results = trainClassifiers(X[:500], y[:500])
     saveResultsTo_csv(results)
     pickleDictionaryTo(results)
-    
+    """
     accuracies = [value for value in cv_results.values()]
     plt.figure(figsize=(15, 10))
     plt.title("Mean NSE for all sequence lengths")
@@ -66,7 +67,7 @@ def getData(dataPath):
 
     fileName = "{}/{}.music.arff"
     dataset = None
-    for i in range(1,4):
+    for i in range(1,2):
         with open(fileName.format(dataPath,i), 'r') as f:
             # https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.arff.loadarff.html
             ## Read arff
@@ -87,6 +88,7 @@ def main():
     dataPath = '../data/train_arff'
     print("Start Program")
     X, y = getData(dataPath)
+    trainClassifiers(X[:500], y[:500])
     #plotAccuarcyForClassifiers(X, y)
 
 
