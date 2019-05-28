@@ -1,0 +1,2 @@
+Model,Accuracy,Best Params
+RandomForest,0.99,"{'max_depth': 10, 'n_estimators': 5, 'max_features': 49}"

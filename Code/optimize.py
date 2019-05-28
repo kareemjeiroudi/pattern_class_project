@@ -15,22 +15,30 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 import warnings
 
-# FIXME: ImportError: cannot import name 'getModelTypes'
-#from train import getModelTypes
-
+def getSplittedData(X, y, forValidation):
+    X_train, X_val, y_train, y_val = train_test_split(X, y, shuffle=True, train_size=0.8)
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, shuffle=True)
+    if forValidation:
+        return X_train, X_val, y_train, y_val
+    else:
+        return X_train, X_test, y_train, y_test
+    
+    
 def getModelTypes():
-    return ['Baseline', 'LinearModel', 'Naive', 'KNN', 'SVM', 'DecisionTree', 'RandomForest', 'NN']
+    return [#'Baseline', 'LinearModel', 'Naive', 'KNN', 'SVM', 'DecisionTree', 
+            'RandomForest'
+            #, 'NN'
+            ]
 
 def getSearchSpace(model, X, y):
     """ Returns the proper set of hyperparameters as well as objective function given a model type. Handy for Bayesian Optimization"""
-
-    folds = 5
+    X_train, X_val, y_train, y_val= getSplittedData(X, y, forValidation=True)
     RSEED = 0
     trainableParameters = None
-    
     if model == 'Naive':
         # no hyperparameters to tune
         trainableParameters = {
@@ -38,10 +46,9 @@ def getSearchSpace(model, X, y):
                 }
         def objective_function(none_parameter):
             classifier = GaussianNB()
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'Baseline':
         # no hyperparameters to tune
@@ -50,10 +57,9 @@ def getSearchSpace(model, X, y):
                 }
         def objective_function(none_parameter):
             classifier = DummyClassifier(strategy = "most_frequent", random_state=RSEED)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'LinearModel':
         # no hyperparameters to tune
@@ -62,10 +68,9 @@ def getSearchSpace(model, X, y):
                 }
         def objective_function(none_parameter):
             classifier = linear_model.LogisticRegression()
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'RandomForest':
         trainableParameters = {
@@ -79,10 +84,9 @@ def getSearchSpace(model, X, y):
             max_depth = int(round(max_depth))
             max_features = int(round(max_features))
             classifier = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, max_features=max_features)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'SVM':
         # reference list # poly kernel is removed, due to computational expense
@@ -99,10 +103,9 @@ def getSearchSpace(model, X, y):
             kernel = kernels[kernel] # unpack from reference list
             degree = int(round(degree))
             classifier = SVC(C=C, kernel=kernel, degree=degree, gamma=gamma)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'DecisionTree':
         criteria = ['gini', 'entropy']
@@ -121,10 +124,9 @@ def getSearchSpace(model, X, y):
             
             classifier = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, max_features=max_features,
                                                 min_samples_leaf=min_samples_leaf, random_state=RSEED)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                   verbose=0
-#                   error_score = "raise-deprecating"
-                    ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     elif model == 'KNN':
         algorithms = ['ball_tree', 'kd_tree', 'brute']
@@ -142,10 +144,9 @@ def getSearchSpace(model, X, y):
             metric = metrics[metric]
             
             classifier = KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=algorithm, metric=metric)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                       verbose=0
-    #                   error_score = "raise-deprecating"
-                        ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
             
     # TODO: add search space and objective function for QDAnalysis
     elif model == 'QDAnalysis':
@@ -176,10 +177,9 @@ def getSearchSpace(model, X, y):
             classifier = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation=activation,
                                        solver=solver, alpha=alpha, learning_rate_init=learning_rate_init,
                                        random_state=RSEED)
-            return cross_val_score(classifier, X, y, cv=folds, scoring=make_scorer(accuracy_score),
-                       verbose=0
-    #                   error_score = "raise-deprecating"
-                        ).mean()
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_val)
+            return accuracy_score(y_val, y_pred)
     else:
         warnings.warn("Model is of Unknown Type!\nKnown Types: {}".format(getModelTypes()), 
                       UserWarning, stacklevel=1)
@@ -190,12 +190,11 @@ def getSearchSpace(model, X, y):
 
 
 def interpret_params(params, model):
-    """Sets the actual names of the hyperparameters for interpretability"""
-    if model == 'RandomForest':
-        hyperparameters = ['n_estimators', 'max_depth', 'max_features']
-        for key in params.keys():
-            if key in hyperparameters:
-                params[key] = int(round(params[key]))
+    """Sets the actual names of the hyperparameters for interpretability. E.g. activation 1.4 isn't interpretable. 
+    This function finds out that it was initially Sigmoid"""
+    
+    if model == 'LinearModel' or model == 'Naive' or model == 'Baseline':
+        params = {}
                 
     elif model == 'SVM':
         kernels = ['linear', 'rbf', 'sigmoid']
@@ -219,6 +218,12 @@ def interpret_params(params, model):
             else:
                 params[key] = int(round(params[key]))
     
+    elif model == 'RandomForest':
+        hyperparameters = ['n_estimators', 'max_depth', 'max_features']
+        for key in params.keys():
+            if key in hyperparameters:
+                params[key] = int(round(params[key]))
+    
     elif model == 'DecisionTree':
         criteria = ['gini', 'entropy']
         for key in params.keys():
@@ -227,11 +232,7 @@ def interpret_params(params, model):
             else:
                 value = criteria[int(round(params.pop('criterion')))]
                 params[key] = value
-    
-    # TODO: add interpretation for QDAnalysis
-    elif model == 'QDAnalysis':
-        classifier = QuadraticDiscriminantAnalysis()
-        
+            
     elif model == 'NN': # acr.: neural networks
         activations = ['logistic', 'tanh', 'relu']
         solvers = ['lbfgs', 'sgd', 'adam']
