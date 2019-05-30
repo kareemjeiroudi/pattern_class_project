@@ -84,7 +84,7 @@ def majority_vote(y, window = 100):
         y_new.append(np.bincount(y[l:r]).argmax())
     return y_new
 
-def filtering(y, threshold = 450):
+def filtering(y, threshold = 50):
     """
     Filters out segments of music that are shorter than 1.5 minutes 
     Every Frame is 200ms * 5 * 60 * 1.5 = 450
